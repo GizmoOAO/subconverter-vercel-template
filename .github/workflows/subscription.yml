@@ -1,0 +1,23 @@
+name: subscription
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 21 * * *' # 每天时间21时(北京时间凌晨5点)触发更新
+  watch:
+    types: started
+jobs:
+  subscription:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: sh generate.sh ${{ secrets.KEY }}
+      - uses: amondnet/vercel-action@v20.0.0
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-project-id: ${{ secrets.PROJECT_ID}}
+          vercel-org-id: ${{ secrets.ORG_ID}}
+          github-comment: false
+          vercel-args: '--prod --confirm'
+          working-directory: ./subconverter/out
